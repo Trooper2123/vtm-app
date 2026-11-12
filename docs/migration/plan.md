@@ -7,9 +7,9 @@
 
 ## 1. Objetivo e estratégia
 
-Migrar o produto por **fluxos verticais completos** — interface, API, dados e validação — mantendo o app atual disponível enquanto cada fluxo novo é aprovado. Não fazer uma cópia integral do monólito nem iniciar os novos módulos antes de saber como identidade, autorização e banco vão funcionar entre os dois apps.
+Migrar o produto por **fluxos verticais completos** — interface, API, regras e validação — mantendo o app atual disponível enquanto cada fluxo novo é aprovado. Não fazer uma cópia integral do monólito.
 
-O app antigo permanece como referência funcional e fonte de regras até que cada fluxo migrado tenha evidência de equivalência e aceite. A aplicação nova deve ser liberada gradualmente, sem duplicar cadastros nem manter dois escritores para a mesma funcionalidade.
+**Fora do escopo:** transferir ou importar fichas, mesas, sessões, usuários ou quaisquer registros existentes do app antigo. O novo app começa com um banco próprio vazio (além de dados sintéticos em Preview). Os registros atuais continuam acessíveis somente no app antigo. A migração trata do código e das capacidades funcionais; não converte dados legados.
 
 ## 2. O que foi encontrado
 
@@ -31,18 +31,18 @@ O README do app antigo classifica vários recursos como implementados, mas ressa
 - **Frontend — `apps/web`:** páginas, componentes, navegação e estado visual. Não acessa PostgreSQL, não contém credenciais privadas e não decide autorização.
 - **Backend — `apps/api`:** funções Node.js/TypeScript em `api/v1/`; autentica e autoriza no servidor, aplica regras de domínio e acessa dados/serviços externos.
 - **Contrato:** `docs/api/openapi.yaml` descreve cada endpoint; `docs/api/flows/` registra os fluxos exercitáveis. Ambos acompanham a implementação no mesmo conjunto de mudanças.
-- **Banco:** PostgreSQL/Neon continua como fonte única dos dados. Se for mantido o banco atual, preservar identificadores e compatibilidade do schema. Para desenvolvimento e Preview, usar banco/branch isolado com dados fictícios.
+- **Banco:** PostgreSQL/Neon em uma base própria do `vtm-app`, sem copiar nem compartilhar o banco de produção do app antigo. A base de produção nova começa vazia; a base de desenvolvimento/Preview deve usar dados fictícios. Não importar registros legados ou linhas de usuários.
 - **Autenticação:** definir primeiro a troca segura de identidade entre frontend e API. O cookie de sessão do Auth0 do Next antigo não deve ser presumido válido no domínio/projeto da nova API. A API precisa validar token/claims e autorizar cada recurso. A decisão entre chamadas servidor-servidor usando sessão do frontend (BFF) e token de acesso enviado pelo cliente deve ser validada com Auth0, CORS, callbacks, logout e os domínios da Vercel antes de migrar fluxos com dados privados.
 - **Integrações:** preservar controle de acesso a arquivos privados e salas LiveKit no backend; nenhuma chave secreta deve chegar ao navegador.
 
 ## 4. Regras para dados e compatibilidade
 
-1. Começar com uma branch/banco Neon de desenvolvimento isolado, contendo dados fictícios representativos. Nunca apontar testes para produção.
-2. Antes de liberar qualquer escrita nova em produção, documentar tabelas e colunas usadas, invariantes, autorização, efeitos colaterais e testes de rollback.
-3. Não executar DDL automaticamente durante uma requisição. Separar a inicialização em `ensureAllTables()` do app antigo em migrações controladas, revisadas e aditivas.
-4. Enquanto app antigo e novo estiverem ativos, toda alteração de schema precisa continuar compatível com o código antigo. Não renomear/remover colunas, mudar semântica ou migrar dados sem plano expand/contract.
-5. Não fazer dual-write. Um fluxo migrado tem um caminho de escrita definido. O app antigo continua sendo o escritor daquele fluxo até a virada; após a virada, o novo backend assume. Leitura temporária pelos dois apps só é permitida após confirmar compatibilidade.
-6. Se for necessário mudar ou separar o banco no futuro, tratar isso como projeto próprio: backup recuperável, mapeamento, cópia, reconciliação de contagens/relacionamentos, teste de restauração e janela de cutover. Este plano não autoriza uma migração de dados de produção.
+1. Criar uma base Neon própria para o `vtm-app`; não conectar os projetos novos ao banco de produção do legado.
+2. Não copiar/importar registros de personagens, mesas, sessões, perfis ou outros dados do app antigo. O banco novo de produção começa vazio; Preview/dev usam dados sintéticos.
+3. O app antigo continua operando com seus dados e banco atuais. O novo app grava somente na base nova. Não há dual-write, leitura cruzada ou sincronização entre as aplicações.
+4. Controlar o schema do banco novo por migrações versionadas e revisadas; não executar DDL automaticamente durante requisições.
+5. Antes de liberar escrita nova em produção, documentar tabelas, invariantes, autorização, efeitos colaterais, backup e rollback do próprio `vtm-app`.
+6. Registros criados no `vtm-app` não aparecerão no legado. Se houver rollback de tráfego para o app antigo, novos registros do app novo ficarão acessíveis somente nele; não planejar cópia de volta como parte deste trabalho.
 
 ## 5. Fases propostas
 
@@ -83,11 +83,11 @@ Começar por leitura de dados de referência sem alterar personagens ou mesas. C
 
 ### Fase 3 — Perfil e ciclo básico de personagem
 
-Migrar um fluxo de cada vez: perfil do usuário; listar/visualizar ficha própria; criar ficha; editar; validar; duplicar; vincular a mesa e aprovar, conforme escopo realmente validado.
+Migrar um fluxo de cada vez: criação de perfil na base nova após autenticação; criar, listar, visualizar, editar e validar fichas criadas no `vtm-app`; depois duplicar fichas dentro do novo app. Não buscar nem importar fichas do legado.
 
-**Atenção:** manter o mesmo identificador de usuário do Auth0 se o banco atual for compartilhado. Toda consulta e mutação precisa aplicar propriedade/permissão no servidor.
+**Atenção:** a identidade Auth0 pode ser a mesma, mas perfis e registros da aplicação são novos e ficam no banco do `vtm-app`. Toda consulta/mutação deve aplicar propriedade e permissão no servidor.
 
-**Gate:** testes de não autenticado, usuário sem permissão, tentativa de acesso a ficha alheia, persistência após nova sessão e regressão das operações legadas sobre o mesmo schema.
+**Gate:** testes de não autenticado, usuário sem permissão, tentativa de acesso a ficha de outra conta criada no novo app e persistência após nova sessão. Não é necessário testar compatibilidade de dados com o schema legado.
 
 ### Fase 4 — Evolução e regras do personagem
 
@@ -97,7 +97,7 @@ Migrar recursos em etapas dependentes: atributos/condições e ações de sangue
 
 ### Fase 5 — Mesas e agenda
 
-Migrar criação/gestão da mesa, participantes, convites, políticas e configurações; em seguida, eventos, calendário, disponibilidade e convocação. Manter propriedade da mesa e participação independentes do perfil comum do Auth0.
+Migrar criação/gestão de novas mesas, participantes, convites, políticas e configurações; em seguida, eventos, calendário, disponibilidade e convocação. Não importar mesas, participantes ou eventos existentes do app antigo. Manter propriedade da mesa e participação independentes do perfil comum do Auth0.
 
 **Gate:** isolamento entre mesas, convite com estados e expiração conforme comportamento aprovado, calendário consistente e regressão dos fluxos ainda servidos pelo legado.
 
@@ -118,9 +118,10 @@ Integrar uploads e leitura privada via Blob e salas/tokens LiveKit depois de a a
 - Manter o app antigo como entrada principal durante o piloto. Abrir o novo app para um grupo pequeno e ampliar após aceite de cada fluxo.
 - Comunicar qual aplicação é responsável por cada fluxo e evitar alternar uma edição entre duas interfaces sem uma estratégia explícita de compatibilidade.
 - Definir domínio, callbacks Auth0, comunicação aos usuários, observabilidade e procedimento de retorno antes de redirecionar o acesso geral.
-- Encerrar o legado somente quando todos os fluxos necessários estiverem migrados, dados reconciliados e período de estabilidade cumprido.
+- O app antigo permanece como acesso aos registros legados. Encerrá-lo é uma decisão independente e não faz parte desta migração.
+- Como as bases são separadas, não haverá reconciliação entre registros antigos e novos. Comunicar que fichas/mesas antigas permanecem no legado e as criadas no `vtm-app` existem apenas no novo app.
 
-**Gate final:** jornada integral aprovada, suporte/observabilidade prontos, rollback praticado e decisão explícita de cutover.
+**Gate final:** jornadas novas aprovadas, suporte/observabilidade prontos, rollback praticado e decisão explícita de adoção. O cutover não transfere registros.
 
 ## 6. Critério de aceite por fluxo
 
@@ -132,7 +133,7 @@ Um módulo só está pronto para migrar/ser liberado quando:
 - [ ] Autenticação, autorização, propriedade do recurso e isolamento por usuário/mesa foram testados no servidor.
 - [ ] Testes relevantes de domínio, contrato, integração e interface passam no ambiente isolado.
 - [ ] O Preview de `dev` foi exercitado com dados fictícios, incluindo sucesso, erro e tentativa de acesso indevido.
-- [ ] Banco e serviços externos não receberam alterações não autorizadas; migrações são revisadas e compatíveis com o legado.
+- [ ] Banco e serviços externos não receberam alterações não autorizadas; migrações do banco novo estão revisadas. Nenhum dado legado foi copiado.
 - [ ] Limitações e pendências foram registradas; não se chama de “validado” algo que só foi implementado ou compilado.
 
 ## 7. Estratégia de teste e deploy
@@ -142,7 +143,7 @@ Um módulo só está pronto para migrar/ser liberado quando:
 - Testar contra PostgreSQL local isolado ou branch Neon de Preview com dados sintéticos. Nunca executar seed, limpeza ou testes mutáveis na produção.
 - Integrar feature branches em `dev` para gerar Preview; branches fora de `dev` e `main` não geram deploy nesses projetos. Fazer merge em `main` só depois do aceite no Preview, conforme [docs/deployments.md](../deployments.md).
 - Para mudanças que atingem os dois projetos, verificar deployment do frontend e da API, comunicação entre origens, CORS, autenticação e fluxo completo; não validar cada projeto isoladamente apenas pelo status de build.
-- Manter o app antigo implantado durante a adoção. Reversão de aplicação não deve apagar tabelas nem desfazer dados de usuários.
+- Manter o app antigo implantado durante a adoção. Ele continua sendo o único acesso aos registros antigos; o app novo usa sua própria base. Reversão do deployment novo preserva os dados novos, mas não os torna visíveis no legado.
 
 ## 8. Riscos e decisões antes do piloto
 
@@ -150,10 +151,11 @@ Um módulo só está pronto para migrar/ser liberado quando:
 | --- | --- |
 | Sessão Auth0 presa ao Next.js antigo | Fechar o padrão de sessão/token e validar callbacks, audiência, CORS e domínios antes de migrar qualquer dado privado. |
 | Diferença de versões Next/React | Testar a compatibilidade e escolher a versão-alvo antes de portar componentes; não copiar dependências em bloco. |
-| DDL em runtime e migrações manuais | Mapear todo o schema, formalizar migrações e preservar compatibilidade enquanto o legado continuar escrevendo. |
+| DDL em runtime e migrações manuais | Não levar o DDL do monólito para a API nova; definir schema e migrações versionadas para a base própria. |
 | Semântica escondida nas 93 rotas | Inventariar consumidores e efeitos colaterais por fluxo; API nova não deve ser somente um proxy genérico para a antiga. |
 | Funcionalidade parcial apresentada como pronta | Usar status de implementação e evidência de validação separados; itens parciais ficam fora do piloto. |
 | Arquivos e tempo real | Manter políticas de autorização e URLs/tokens privados no backend; migrar após o fluxo básico da sessão. |
-| Rollback com dados novos | Compatibilidade expand/contract, sem dual-write, preservando estrutura e dados ao reverter o deployment. |
+| Bases independentes | Não haverá importação nem sincronização. O legado mantém seus registros; novos registros pertencem ao `vtm-app` e não aparecem no app antigo. |
+| Rollback com dados novos | Reverter o código não apaga a base nova. Se o tráfego voltar ao legado, os registros criados no `vtm-app` só permanecem acessíveis pelo próprio app novo. |
 
 **Primeira ação recomendada:** concluir a Fase 0 e aprovar o padrão Auth0/Neon na Fase 1. Em seguida, escolher o primeiro catálogo somente após confirmar no legado o comportamento, os testes e o critério de aceite.
