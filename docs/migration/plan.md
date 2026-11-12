@@ -52,10 +52,10 @@ O README do app antigo classifica vários recursos como implementados, mas ressa
 
 - Inventário estático detalhado em [`docs/migration/inventory.md`](./inventory.md): 93 rotas e métodos, 23 páginas, módulos de domínio, tabelas declaradas, modelo de autorização, integrações e testes encontrados.
 - Estados do legado separados entre implementação, configuração, evidência de teste, pendências e decisão de migração; nenhum dado de personagens, mesas, sessões ou usuários será transferido.
-- Busca inicial por ações de servidor; mutações encontradas estão nos Route Handlers. A relação completa entre UI, chamadas, payloads/erros e efeitos colaterais deve ser confirmada durante o piloto.
+- Busca inicial por ações de servidor; mutações encontradas estão nos Route Handlers. A relação completa entre UI, chamadas, payloads/erros, cookies e efeitos colaterais do piloto continua pendente e será registrada antes da implementação.
 - Piloto proposto: leitura do catálogo de poderes de disciplina, sem migrar telas/persistência de fichas nem registros de mesas. O handler tem teste de sessão ausente e validação de parâmetros; o teste ainda precisa ser executado.
 
-**Gate:** inventário e escopo do piloto registrados. O gate de reprodução do comportamento legado permanece **pendente** até executar os testes e a consulta no ambiente isolado; os arquivos de teste e os resultados de CI de escopo limitado não provam validação global.
+**Gate:** inventário e escopo do piloto registrados; contrato detalhado do piloto e reprodução em ambiente isolado permanecem **pendentes**. Executar os testes e a consulta autenticada/sem sessão antes de considerar a Fase 0 fechada. Arquivos de teste e CI de escopo limitado não provam validação global.
 
 ### Fase 1 — Base técnica, identidade e contrato
 
