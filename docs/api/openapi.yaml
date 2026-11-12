@@ -1,0 +1,38 @@
+openapi: 3.1.0
+info:
+  title: VTM App API
+  version: 1.0.0
+  description: Contrato inicial da API do novo app.
+servers:
+  - url: https://{api-host}
+    variables:
+      api-host:
+        default: api.example.com
+paths:
+  /api/v1/health:
+    get:
+      operationId: getHealth
+      summary: Verifica a disponibilidade da API
+      tags:
+        - Health
+      responses:
+        "200":
+          description: API disponível
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - service
+                  - timestamp
+                properties:
+                  status:
+                    type: string
+                    const: ok
+                  service:
+                    type: string
+                    example: vtm-app-api
+                  timestamp:
+                    type: string
+                    format: date-time
