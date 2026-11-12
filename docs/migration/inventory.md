@@ -32,7 +32,7 @@ As contagens representam métodos exportados nos 93 handlers; uma rota pode expo
 
 ## 2. Inventário dos endpoints legados
 
-Os nomes abaixo são caminhos derivados dos arquivos Route Handler. Os métodos foram lidos dos exports. A coluna de guardas registra símbolos encontrados diretamente nos handlers, **não uma aprovação de segurança**: várias rotas delegam autenticação e permissão para serviços compartilhados. Rotas sem guarda literal exigem leitura de todo o caminho de chamada antes da migração.
+Os nomes abaixo são caminhos derivados dos arquivos Route Handler e os métodos foram lidos dos exports. A coluna de guardas registra símbolos encontrados diretamente nos handlers, **não uma aprovação de segurança**: várias rotas delegam autenticação e permissão para serviços compartilhados. Esta tabela ainda não documenta payload/response completo, cookies nem todos os callers. Rotas sem guarda literal exigem leitura de todo o caminho de chamada antes da migração.
 
 | Caminho legado | Métodos | Guarda/helper visto no handler |
 | --- | --- | --- |
@@ -217,19 +217,18 @@ A triagem de símbolos nos 93 handlers encontrou chamadas diretas a `getSessionO
 
 O README legado, atualizado em 03/11/2026, chama as capacidades abaixo de “ativas”, mas diz que configuração e migrações afetam disponibilidade e que isso não equivale à validação integral em produção.
 
-| Fluxo | Estado descrito no legado | Testes relacionados encontrados | Configuração/pendência |
-| --- | --- | --- | --- |
-| Perfil | Implementado | `dev-master-profile.test.ts`, `unified-profile-ownership.test.ts` | Auth0 e persistência; no novo app serão perfis novos. |
-| Catálogos/regras de ficha | Implementados em parte por catálogos V5 | `discipline-powers-route.test.ts`, `discipline-ui.test.ts`, `discipline-power-row.test.ts`, `clan-rules-catalog.test.ts`, `predator-types-core.test.ts`, `merits-flaws-research.test.ts` | Confirmar escopo de regras e fontes; não é implementação integral do livro/sistema. |
-| Personagem | Criação/edição, fichas independentes, duplicação, validação e aprovação listadas como ativas | `character-creation-dialog.test.ts`, `character-form-*.test.ts`, `character-independent*.test.ts`, `character-save-concurrency.test.ts`, `character-type-access-route.test.ts` | Migração de fluxo de código, mas sem fichas legadas no app novo. |
-| Evolução/rolagens | XP/histórico, recursos, ações de sangue e rolagens listados como ativos | `character-xp-*.test.ts`, `character-rolls*.test.ts`, `blood-actions.test.ts`, `v5-spec-dice*.test.ts` | Regras de servidor, idempotência/concorrência e autorização por papel. |
-| Mesas/agenda | Criação/gestão, convites, participantes, políticas, arquivamento, eventos e disponibilidade listados como ativos | `campaign-creation*.test.ts`, `campaign-invitations.test.ts`, `campaign-participant-controls.test.ts`, `campaign-calendar.integration.test.ts`, `availability-audit.test.ts` | Não há registros de mesas antigos no app novo; integração de e-mail externa não está presumida. |
-| Sessões | Sessões persistidas, noites, ferramentas e rolagens listadas como ativas | `game-sessions.test.ts`, `game-session-storage.test.ts`, `session-hub-collaboration.test.ts`, `session-rolls` (coberto por testes V5) | README relata pendências globais de validação e requer PostgreSQL; sem registros anteriores no novo banco. |
-| NPCs/fichas narrativas | Há partes ativas e outras parciais | `npc-domain-v2.test.ts`, `npc-validation.test.ts`, `sheet-media-lifecycle.test.ts`, `sheet-relations-submit.test.ts` | 10 tabelas iniciais definidas em migração própria; validar destino e objetos Blob novos. |
-| Notas, handouts e mídia | Implementados com controles de visibilidade; disponibilidade depende de schema/configuração | `notes.test.ts`, `session-notes.test.ts`, `sheet-media-api.test.ts`, `sheet-media-ui.test.ts` | Banco, Blob privado, permissões de Narrador/participante. |
-| Voz/vídeo | LiveKit opcional | `livekit-token.test.ts` | Requer configuração e integração externa real; não é bom primeiro piloto. |
-| Itens parciais/planejados | NPC/carniçal e combate completos; feed/visibilidade da chamada; wiki; regras avançadas | Testes existentes cobrem recortes específicos | Não incluir como “validado” só porque há código/testes parciais. |
-
+| Fluxo | Estado descrito no legado | Testes relacionados encontrados | Configuração/pendências | Decisão para a migração |
+| --- | --- | --- | --- | --- |
+| Perfil | Implementado | `dev-master-profile.test.ts`, `unified-profile-ownership.test.ts` | Auth0 e persistência; no novo app serão perfis novos. | Migrar depois da base de identidade; criar perfis novos, sem importar linhas antigas. |
+| Catálogos/regras de ficha | Implementados em parte por catálogos V5 | `discipline-powers-route.test.ts`, `discipline-ui.test.ts`, `discipline-power-row.test.ts`, `clan-rules-catalog.test.ts`, `predator-types-core.test.ts`, `merits-flaws-research.test.ts` | Confirmar escopo de regras e fontes; não é implementação integral do sistema V5. | **Piloto proposto:** catálogo somente leitura de poderes de disciplina, condicionado à execução dos testes. |
+| Personagem | Criação/edição, fichas independentes, duplicação, validação e aprovação listadas como ativas | `character-creation-dialog.test.ts`, `character-form-*.test.ts`, `character-independent*.test.ts`, `character-save-concurrency.test.ts`, `character-type-access-route.test.ts` | Migração de fluxo de código, mas sem fichas legadas no app novo. | Migrar funcionalidade em etapa posterior; fichas existentes ficam somente no legado. |
+| Evolução/rolagens | XP/histórico, recursos, ações de sangue e rolagens listados como ativos | `character-xp-*.test.ts`, `character-rolls*.test.ts`, `blood-actions.test.ts`, `v5-spec-dice*.test.ts` | Regras de servidor, idempotência/concorrência e autorização por papel. | Depois do ciclo de personagem; não portar XP ou estado de fichas existentes. |
+| Mesas/agenda | Criação/gestão, convites, participantes, políticas, arquivamento, eventos e disponibilidade listados como ativos | `campaign-creation*.test.ts`, `campaign-invitations.test.ts`, `campaign-participant-controls.test.ts`, `campaign-calendar.integration.test.ts`, `availability-audit.test.ts` | Não há registros de mesas antigos no app novo; integração de e-mail externa não está presumida. | Migrar criação e gestão de novas mesas depois do perfil/personagem; sem importar mesas, participantes ou eventos antigos. |
+| Sessões | Sessões persistidas, noites, ferramentas e rolagens listadas como ativas | `game-sessions.test.ts`, `game-session-storage.test.ts`, `session-hub-collaboration.test.ts`; ver também `v5-spec-dice*.test.ts` | README relata pendências globais de validação e requer PostgreSQL; sem registros anteriores no novo banco. | Posterior às mesas novas e ao personagem; somente sessões criadas no `vtm-app`. |
+| NPCs/fichas narrativas | Há partes ativas e outras parciais | `npc-domain-v2.test.ts`, `npc-validation.test.ts`, `sheet-media-lifecycle.test.ts`, `sheet-relations-submit.test.ts` | 10 tabelas iniciais definidas em migração própria; validar destino e objetos Blob novos. | Migrar depois de sessão/autorizações; sem migrar fichas narrativas ou registros de mesa antigos. |
+| Notas, handouts e mídia | Implementados com controles de visibilidade; disponibilidade depende de schema/configuração | `notes.test.ts`, `session-notes.test.ts`, `sheet-media-api.test.ts`, `sheet-media-ui.test.ts` | Banco, Blob privado, permissões de Narrador/participante. | Posterior ao fluxo básico de mesa; armazenar novos itens apenas no serviço do app novo. |
+| Voz/vídeo | LiveKit opcional | `livekit-token.test.ts` | Requer configuração e integração externa real; não é bom primeiro piloto. | Migrar por último e somente após validar autorização de sessão/sala. |
+| Itens parciais/planejados | NPC/carniçal e combate completos; feed/visibilidade da chamada; wiki; regras avançadas | Testes existentes cobrem recortes específicos | Não incluir como “validado” só porque há código/testes parciais. | Adiar até escopo, regra, teste e dependência editorial estarem confirmados. |
 ### Testes e execução CI observados
 
 - Testes são Vitest, com configuração que rejeita `DATABASE_URL` fora de localhost e usa schema isolado `meus_vampiros_test`. Há helpers que abortam se o host do banco não for local.
@@ -258,6 +257,7 @@ O README legado, atualizado em 03/11/2026, chama as capacidades abaixo de “ati
 - [x] Inventário estático dos 93 handlers, métodos, 23 páginas, módulos, tabelas declaradas, regras de autorização, integrações e testes relacionados.
 - [x] Status funcional separado de configuração e evidência de teste; itens parciais anotados.
 - [x] Piloto proposto e delimitado sem migração de fichas, mesas ou registros.
-- [ ] Reproduzir o fluxo de referência no ambiente isolado do app legado; sem esse passo, o gate da Fase 0 não está fechado.
+- [ ] Completar para o piloto o mapa UI→endpoint, parâmetros/corpo, respostas/erros, efeitos de sessão/cookies e chamadas repetidas/lote.
+- [ ] Reproduzir o fluxo de referência no ambiente isolado do app legado; sem esses passos, o gate da Fase 0 não está fechado.
 
-**Conclusão:** a leitura do repositório dá base suficiente para iniciar a preparação técnica, mas ainda não aprova nenhum fluxo para lançamento. O primeiro candidato é o catálogo de poderes; ele só deve ser considerado baseline depois que o teste local isolado for executado e o comportamento confirmado.
+**Conclusão:** a leitura do repositório dá base para iniciar a preparação técnica, mas a Fase 0 está parcialmente concluída: o contrato detalhado do piloto e sua reprodução isolada ainda estão pendentes. Nenhum fluxo está aprovado para lançamento. O primeiro candidato é o catálogo de poderes; ele só deve ser considerado baseline depois que o teste local isolado for executado e o comportamento confirmado.
