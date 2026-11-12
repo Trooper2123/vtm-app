@@ -36,99 +36,99 @@ Os nomes abaixo são caminhos derivados dos arquivos Route Handler. Os métodos 
 
 | Caminho legado | Métodos | Guarda/helper visto no handler |
 | --- | --- | --- |
-| `/campaign-availability` | `GET`, `POST`, `PATCH` | `getSessionOrDev`, `isUserInCampaign` |
-| `/campaign-event-calendar/status` | `GET`, `PATCH` | `getSessionOrDev`, `canManageCampaign`, `isUserInCampaign` |
-| `/campaign-event-calendar/toggle` | `PATCH` | `getSessionOrDev`, `canManageCampaign` |
-| `/campaign-events` | `GET`, `POST`, `PATCH`, `DELETE` | `getSessionOrDev`, `canManageCampaign`, `isUserInCampaign` |
-| `/campaign-invitations` | `POST` | `notesActor` |
-| `/campaign-scheduling-calendar/status` | `GET`, `PATCH` | `getSessionOrDev`, `canManageCampaign`, `isUserInCampaign` |
-| `/campaign-scheduling-calendar/toggle` | `PATCH` | `getSessionOrDev`, `canManageCampaign` |
-| `/campaigns/[id]/archive` | `PATCH` | `notesActor` |
-| `/campaigns/[id]/awake-settings` | `GET`, `POST` | `getSessionOrDev` |
-| `/campaigns/[id]/blood-policy` | `GET`, `PATCH` | `getSessionOrDev`, `canManageCampaign` |
-| `/campaigns/[id]/call/roll-characters` | `GET` | `notesActor` |
-| `/campaigns/[id]/call` | `GET`, `PUT` | `notesActor` |
-| `/campaigns/[id]/character-sms/[threadId]` | `GET`, `POST`, `PATCH` | Política delegada ao serviço/helper; confirmar por método |
-| `/campaigns/[id]/character-sms/contacts` | `GET` | Política delegada ao serviço/helper; confirmar por método |
-| `/campaigns/[id]/character-sms` | `GET`, `POST` | Política delegada ao serviço/helper; confirmar por método |
-| `/campaigns/[id]/clans` | `GET` | `getSessionOrDev`, `canManageCampaign` |
-| `/campaigns/[id]/coteries` | `GET`, `POST` | `getSessionOrDev` |
-| `/campaigns/[id]/cover` | `GET`, `PUT`, `DELETE` | `getSessionOrDev` |
-| `/campaigns/[id]/details` | `PATCH` | `getSessionOrDev` |
-| `/campaigns/[id]/handouts` | `GET`, `POST` | `notesActor` |
-| `/campaigns/[id]/handouts/upload` | `POST` | `notesActor` |
-| `/campaigns/[id]/limits/[limitId]` | `PATCH`, `DELETE` | `getSessionOrDev` |
-| `/campaigns/[id]/limits` | `GET`, `POST` | `getSessionOrDev` |
-| `/campaigns/[id]/missions` | `GET`, `POST` | `getSessionOrDev` |
-| `/campaigns/[id]/nights/awake` | `GET`, `POST` | `getSessionOrDev` |
-| `/campaigns/[id]/npc-catalog-settings` | `GET`, `PATCH` | `getSessionOrDev` |
-| `/campaigns/[id]/npcs` | `POST` | `notesActor`, `canManageCampaign` |
-| `/campaigns/[id]/participants` | `GET` | `profileActor` |
-| `/campaigns/[id]/player-handouts/[handoutId]` | `GET` | `getSessionOrDev` |
-| `/campaigns/[id]/player-handouts` | `GET` | `getSessionOrDev`, `playerHandouts` |
-| `/campaigns/[id]/predator-types` | `GET` | `getSessionOrDev`, `canManageCampaign` |
-| `/campaigns/[id]/predator-types/settings` | `PATCH` | `getSessionOrDev`, `canManageCampaign` |
-| `/campaigns/[id]/projects` | `GET`, `POST` | `getSessionOrDev` |
-| `/campaigns/[id]/projects/stakes` | `GET` | `getSessionOrDev` |
-| `/campaigns/[id]/session-shortcuts` | `GET`, `PATCH` | `getSessionOrDev` |
-| `/campaigns/[id]/sessions` | `GET`, `POST` | `notesActor` |
-| `/campaigns/[id]/settings/character-sms` | `GET`, `PATCH` | Política delegada ao serviço/helper; confirmar por método |
-| `/campaigns/[id]/sheets` | `GET`, `POST` | `notesActor` |
-| `/campaigns/[id]/visual` | `GET`, `PUT` | `notesActor` |
-| `/campaigns/[id]/xp-history` | `GET`, `PATCH` | `notesActor` |
-| `/campaigns/[id]/xp` | `POST` | `getSessionOrDev`, `canManageCampaign` |
-| `/campaigns` | `GET`, `POST` | `getSessionOrDev`, `hasMasterAccess` |
-| `/characters/[id]/awake` | `GET`, `POST` | `getSessionOrDev` |
-| `/characters/[id]/blood-actions` | `POST` | `getSessionOrDev` |
-| `/characters/[id]/blood-potency-effects` | `GET` | `getSessionOrDev` |
-| `/characters/[id]/campaign` | `POST` | `notesActor` |
-| `/characters/[id]/clan` | `GET`, `PATCH`, `POST` | `getSessionOrDev`, `notesActor` |
-| `/characters/[id]/condition` | `PATCH` | `notesActor` |
-| `/characters/[id]/discipline-rolls` | `GET`, `POST` | `getSessionOrDev` |
-| `/characters/[id]/disciplines` | `GET`, `POST` | `getSessionOrDev`, `notesActor` |
-| `/characters/[id]/duplicate` | `POST` | `getSessionOrDev` |
-| `/characters/[id]/predator-type/override` | `POST` | `getSessionOrDev`, `canManageCampaign` |
-| `/characters/[id]/predator-type` | `DELETE`, `POST` | `getSessionOrDev` |
-| `/characters/[id]/resources` | `GET`, `PATCH` | `getSessionOrDev` |
-| `/characters/[id]/rolls/[rollId]/adjudications` | `POST` | `notesActor` |
-| `/characters/[id]/rolls/[rollId]/reroll` | `POST` | `notesActor` |
-| `/characters/[id]/rolls` | `GET`, `POST` | `getSessionOrDev`, `notesActor` |
-| `/characters/[id]/session-summary` | `GET` | `getSessionOrDev` |
-| `/characters/[id]/specialties` | `GET`, `POST` | `getSessionOrDev` |
-| `/characters/[id]/status` | `PATCH` | `notesActor` |
-| `/characters/[id]/validate` | `POST`, `GET` | `getSessionOrDev`, `canManageCampaign` |
-| `/characters/resources` | `PATCH` | `getSessionOrDev` |
-| `/characters` | `GET`, `POST`, `PUT`, `DELETE`, `PATCH` | `getSessionOrDev`, `notesActor`, `hasMasterAccess`, `canManageCampaign`, `isUserInCampaign` |
-| `/characters/xp-import` | `POST` | `getSessionOrDev` |
-| `/discipline-powers` | `GET` | `getSessionOrDev` |
-| `/handouts/[id]/file` | `GET` | `notesActor` |
-| `/handouts/[id]` | `DELETE` | `notesActor` |
-| `/handouts/[id]/share` | `PATCH` | `notesActor` |
-| `/livekit/room` | `GET`, `POST` | `getSessionOrDev`, `notesActor` |
-| `/merits-flaws` | `GET` | `getSessionOrDev` |
-| `/migrate` | `POST` | Política delegada ao serviço/helper; confirmar por método |
-| `/notes/[id]` | `GET`, `PATCH`, `DELETE` | `notesActor` |
-| `/notes/context` | `GET` | `notesActor` |
-| `/notes/links` | `GET` | `notesActor` |
-| `/notes` | `GET`, `POST` | `notesActor` |
-| `/npc-templates` | `GET` | `narratorActor` |
-| `/npcs/[id]` | `GET`, `PATCH`, `DELETE` | `narratorActor` |
-| `/npcs` | `GET`, `POST` | `narratorActor` |
-| `/possessions` | `GET`, `POST`, `PUT` | `getSessionOrDev`, `notesActor`, `canManageCampaign` |
-| `/predator-types` | `GET` | `getSessionOrDev`, `canManageCampaign`, `isUserInCampaign` |
-| `/profile` | `GET`, `PUT` | `profileActor` |
-| `/rule-sources/[id]` | `GET` | `notesActor` |
-| `/sessions/[id]/chat` | `GET`, `POST` | `notesActor` |
-| `/sessions/[id]/npcs` | `GET`, `POST`, `PATCH` | `notesActor` |
-| `/sessions/[id]/reveals` | `GET`, `POST` | `notesActor` |
-| `/sessions/[id]/rolls` | `POST` | `getSessionOrDev` |
-| `/sessions/[id]` | `GET`, `PATCH` | `notesActor` |
-| `/sessions/[id]/soundtrack` | `GET`, `POST` | `getSessionOrDev` |
-| `/sessions/[id]/visual` | `GET`, `PATCH` | `notesActor` |
-| `/sheet-catalog` | `GET` | `notesActor` |
-| `/sheet-media/[id]` | `GET`, `PATCH`, `DELETE` | `notesActor` |
-| `/sheet-media` | `GET`, `POST` | `notesActor` |
-| `/sheet-media/upload` | `POST` | `notesActor` |
+| `/api/campaign-availability` | `GET`, `POST`, `PATCH` | `getSessionOrDev`, `isUserInCampaign` |
+| `/api/campaign-event-calendar/status` | `GET`, `PATCH` | `getSessionOrDev`, `canManageCampaign`, `isUserInCampaign` |
+| `/api/campaign-event-calendar/toggle` | `PATCH` | `getSessionOrDev`, `canManageCampaign` |
+| `/api/campaign-events` | `GET`, `POST`, `PATCH`, `DELETE` | `getSessionOrDev`, `canManageCampaign`, `isUserInCampaign` |
+| `/api/campaign-invitations` | `POST` | `notesActor` |
+| `/api/campaign-scheduling-calendar/status` | `GET`, `PATCH` | `getSessionOrDev`, `canManageCampaign`, `isUserInCampaign` |
+| `/api/campaign-scheduling-calendar/toggle` | `PATCH` | `getSessionOrDev`, `canManageCampaign` |
+| `/api/campaigns/[id]/archive` | `PATCH` | `notesActor` |
+| `/api/campaigns/[id]/awake-settings` | `GET`, `POST` | `getSessionOrDev` |
+| `/api/campaigns/[id]/blood-policy` | `GET`, `PATCH` | `getSessionOrDev`, `canManageCampaign` |
+| `/api/campaigns/[id]/call/roll-characters` | `GET` | `notesActor` |
+| `/api/campaigns/[id]/call` | `GET`, `PUT` | `notesActor` |
+| `/api/campaigns/[id]/character-sms/[threadId]` | `GET`, `POST`, `PATCH` | Política delegada ao serviço/helper; confirmar por método |
+| `/api/campaigns/[id]/character-sms/contacts` | `GET` | Política delegada ao serviço/helper; confirmar por método |
+| `/api/campaigns/[id]/character-sms` | `GET`, `POST` | Política delegada ao serviço/helper; confirmar por método |
+| `/api/campaigns/[id]/clans` | `GET` | `getSessionOrDev`, `canManageCampaign` |
+| `/api/campaigns/[id]/coteries` | `GET`, `POST` | `getSessionOrDev` |
+| `/api/campaigns/[id]/cover` | `GET`, `PUT`, `DELETE` | `getSessionOrDev` |
+| `/api/campaigns/[id]/details` | `PATCH` | `getSessionOrDev` |
+| `/api/campaigns/[id]/handouts` | `GET`, `POST` | `notesActor` |
+| `/api/campaigns/[id]/handouts/upload` | `POST` | `notesActor` |
+| `/api/campaigns/[id]/limits/[limitId]` | `PATCH`, `DELETE` | `getSessionOrDev` |
+| `/api/campaigns/[id]/limits` | `GET`, `POST` | `getSessionOrDev` |
+| `/api/campaigns/[id]/missions` | `GET`, `POST` | `getSessionOrDev` |
+| `/api/campaigns/[id]/nights/awake` | `GET`, `POST` | `getSessionOrDev` |
+| `/api/campaigns/[id]/npc-catalog-settings` | `GET`, `PATCH` | `getSessionOrDev` |
+| `/api/campaigns/[id]/npcs` | `POST` | `notesActor`, `canManageCampaign` |
+| `/api/campaigns/[id]/participants` | `GET` | `profileActor` |
+| `/api/campaigns/[id]/player-handouts/[handoutId]` | `GET` | `getSessionOrDev` |
+| `/api/campaigns/[id]/player-handouts` | `GET` | `getSessionOrDev`, `playerHandouts` |
+| `/api/campaigns/[id]/predator-types` | `GET` | `getSessionOrDev`, `canManageCampaign` |
+| `/api/campaigns/[id]/predator-types/settings` | `PATCH` | `getSessionOrDev`, `canManageCampaign` |
+| `/api/campaigns/[id]/projects` | `GET`, `POST` | `getSessionOrDev` |
+| `/api/campaigns/[id]/projects/stakes` | `GET` | `getSessionOrDev` |
+| `/api/campaigns/[id]/session-shortcuts` | `GET`, `PATCH` | `getSessionOrDev` |
+| `/api/campaigns/[id]/sessions` | `GET`, `POST` | `notesActor` |
+| `/api/campaigns/[id]/settings/character-sms` | `GET`, `PATCH` | Política delegada ao serviço/helper; confirmar por método |
+| `/api/campaigns/[id]/sheets` | `GET`, `POST` | `notesActor` |
+| `/api/campaigns/[id]/visual` | `GET`, `PUT` | `notesActor` |
+| `/api/campaigns/[id]/xp-history` | `GET`, `PATCH` | `notesActor` |
+| `/api/campaigns/[id]/xp` | `POST` | `getSessionOrDev`, `canManageCampaign` |
+| `/api/campaigns` | `GET`, `POST` | `getSessionOrDev`, `hasMasterAccess` |
+| `/api/characters/[id]/awake` | `GET`, `POST` | `getSessionOrDev` |
+| `/api/characters/[id]/blood-actions` | `POST` | `getSessionOrDev` |
+| `/api/characters/[id]/blood-potency-effects` | `GET` | `getSessionOrDev` |
+| `/api/characters/[id]/campaign` | `POST` | `notesActor` |
+| `/api/characters/[id]/clan` | `GET`, `PATCH`, `POST` | `getSessionOrDev`, `notesActor` |
+| `/api/characters/[id]/condition` | `PATCH` | `notesActor` |
+| `/api/characters/[id]/discipline-rolls` | `GET`, `POST` | `getSessionOrDev` |
+| `/api/characters/[id]/disciplines` | `GET`, `POST` | `getSessionOrDev`, `notesActor` |
+| `/api/characters/[id]/duplicate` | `POST` | `getSessionOrDev` |
+| `/api/characters/[id]/predator-type/override` | `POST` | `getSessionOrDev`, `canManageCampaign` |
+| `/api/characters/[id]/predator-type` | `DELETE`, `POST` | `getSessionOrDev` |
+| `/api/characters/[id]/resources` | `GET`, `PATCH` | `getSessionOrDev` |
+| `/api/characters/[id]/rolls/[rollId]/adjudications` | `POST` | `notesActor` |
+| `/api/characters/[id]/rolls/[rollId]/reroll` | `POST` | `notesActor` |
+| `/api/characters/[id]/rolls` | `GET`, `POST` | `getSessionOrDev`, `notesActor` |
+| `/api/characters/[id]/session-summary` | `GET` | `getSessionOrDev` |
+| `/api/characters/[id]/specialties` | `GET`, `POST` | `getSessionOrDev` |
+| `/api/characters/[id]/status` | `PATCH` | `notesActor` |
+| `/api/characters/[id]/validate` | `POST`, `GET` | `getSessionOrDev`, `canManageCampaign` |
+| `/api/characters/resources` | `PATCH` | `getSessionOrDev` |
+| `/api/characters` | `GET`, `POST`, `PUT`, `DELETE`, `PATCH` | `getSessionOrDev`, `notesActor`, `hasMasterAccess`, `canManageCampaign`, `isUserInCampaign` |
+| `/api/characters/xp-import` | `POST` | `getSessionOrDev` |
+| `/api/discipline-powers` | `GET` | `getSessionOrDev` |
+| `/api/handouts/[id]/file` | `GET` | `notesActor` |
+| `/api/handouts/[id]` | `DELETE` | `notesActor` |
+| `/api/handouts/[id]/share` | `PATCH` | `notesActor` |
+| `/api/livekit/room` | `GET`, `POST` | `getSessionOrDev`, `notesActor` |
+| `/api/merits-flaws` | `GET` | `getSessionOrDev` |
+| `/api/migrate` | `POST` | Política delegada ao serviço/helper; confirmar por método |
+| `/api/notes/[id]` | `GET`, `PATCH`, `DELETE` | `notesActor` |
+| `/api/notes/context` | `GET` | `notesActor` |
+| `/api/notes/links` | `GET` | `notesActor` |
+| `/api/notes` | `GET`, `POST` | `notesActor` |
+| `/api/npc-templates` | `GET` | `narratorActor` |
+| `/api/npcs/[id]` | `GET`, `PATCH`, `DELETE` | `narratorActor` |
+| `/api/npcs` | `GET`, `POST` | `narratorActor` |
+| `/api/possessions` | `GET`, `POST`, `PUT` | `getSessionOrDev`, `notesActor`, `canManageCampaign` |
+| `/api/predator-types` | `GET` | `getSessionOrDev`, `canManageCampaign`, `isUserInCampaign` |
+| `/api/profile` | `GET`, `PUT` | `profileActor` |
+| `/api/rule-sources/[id]` | `GET` | `notesActor` |
+| `/api/sessions/[id]/chat` | `GET`, `POST` | `notesActor` |
+| `/api/sessions/[id]/npcs` | `GET`, `POST`, `PATCH` | `notesActor` |
+| `/api/sessions/[id]/reveals` | `GET`, `POST` | `notesActor` |
+| `/api/sessions/[id]/rolls` | `POST` | `getSessionOrDev` |
+| `/api/sessions/[id]` | `GET`, `PATCH` | `notesActor` |
+| `/api/sessions/[id]/soundtrack` | `GET`, `POST` | `getSessionOrDev` |
+| `/api/sessions/[id]/visual` | `GET`, `PATCH` | `notesActor` |
+| `/api/sheet-catalog` | `GET` | `notesActor` |
+| `/api/sheet-media/[id]` | `GET`, `PATCH`, `DELETE` | `notesActor` |
+| `/api/sheet-media` | `GET`, `POST` | `notesActor` |
+| `/api/sheet-media/upload` | `POST` | `notesActor` |
 
 ## 3. Inventário de páginas
 
