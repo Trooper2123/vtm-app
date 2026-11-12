@@ -50,12 +50,12 @@ O README do app antigo classifica vários recursos como implementados, mas ressa
 
 **Entregas**
 
-- Montar inventário das 93 rotas, páginas, ações de servidor, módulos de domínio, tabelas, permissões, dependências externas e testes relacionados.
-- Para cada fluxo, registrar estado: implementado no legado, configuração necessária, evidência de teste, pendências conhecidas e decisão de migrar agora/depois.
-- Identificar contratos implícitos usados pelo frontend antigo: métodos, payloads, erros, efeitos de sessão, cookies e chamadas em lote.
-- Selecionar um fluxo piloto pequeno e completo; não usar uma funcionalidade marcada como parcialmente validada como primeiro lançamento.
+- Inventário estático detalhado em [`docs/migration/inventory.md`](./inventory.md): 93 rotas e métodos, 23 páginas, módulos de domínio, tabelas declaradas, modelo de autorização, integrações e testes encontrados.
+- Estados do legado separados entre implementação, configuração, evidência de teste, pendências e decisão de migração; nenhum dado de personagens, mesas, sessões ou usuários será transferido.
+- Busca inicial por ações de servidor; mutações encontradas estão nos Route Handlers. A relação completa entre UI, chamadas, payloads/erros e efeitos colaterais deve ser confirmada durante o piloto.
+- Piloto proposto: leitura do catálogo de poderes de disciplina, sem migrar telas/persistência de fichas nem registros de mesas. O handler tem teste de sessão ausente e validação de parâmetros; o teste ainda precisa ser executado.
 
-**Gate:** escopo e dependências do piloto revisados; comportamento legado reproduzível em ambiente de desenvolvimento isolado.
+**Gate:** inventário e escopo do piloto registrados. O gate de reprodução do comportamento legado permanece **pendente** até executar os testes e a consulta no ambiente isolado; os arquivos de teste e os resultados de CI de escopo limitado não provam validação global.
 
 ### Fase 1 — Base técnica, identidade e contrato
 
@@ -158,4 +158,4 @@ Um módulo só está pronto para migrar/ser liberado quando:
 | Bases independentes | Não haverá importação nem sincronização. O legado mantém seus registros; novos registros pertencem ao `vtm-app` e não aparecem no app antigo. |
 | Rollback com dados novos | Reverter o código não apaga a base nova. Se o tráfego voltar ao legado, os registros criados no `vtm-app` só permanecem acessíveis pelo próprio app novo. |
 
-**Primeira ação recomendada:** concluir a Fase 0 e aprovar o padrão Auth0/Neon na Fase 1. Em seguida, escolher o primeiro catálogo somente após confirmar no legado o comportamento, os testes e o critério de aceite.
+**Próximo passo:** fechar a reprodução do piloto indicado em [`docs/migration/inventory.md`](./inventory.md) no legado, usando ambiente e dados isolados. Depois, aprovar o padrão Auth0/Neon para a base independente vazia do `vtm-app` e portar somente o catálogo selecionado.
