@@ -14,6 +14,17 @@ Validar que uma pessoa autenticada pelo Auth0 cria um perfil próprio no banco N
 - `DATABASE_URL` no projeto Vercel da API apontando ao Neon compartilhado de Preview/teste.
 - Migration `apps/api/migrations/001_create_profiles.sql` aplicada somente no branch Neon compartilhado de Preview/teste.
 
+## Configuração do Auth0 para Preview
+
+No tenant associado ao projeto Vercel:
+
+1. Cadastre uma API com **Identifier** `https://vtm-app-api` e assinatura RS256. Esse valor deve ser igual ao audience configurado no frontend e na API.
+2. Na aplicação Web, permita o callback `https://meus-vampiros-web-git-dev-tereza-s-cereja.vercel.app/auth/callback`.
+3. Adicione `https://meus-vampiros-web-git-dev-tereza-s-cereja.vercel.app` às Allowed Logout URLs e Allowed Web Origins.
+4. As variáveis de Preview `APP_BASE_URL`, `API_BASE_URL`, `AUTH0_AUDIENCE`, `AUTH0_ISSUER_URL` e `AUTH0_API_AUDIENCE` foram preparadas para a branch `dev`. As credenciais do frontend permanecem nas variáveis `VTM_AUTH_AUTH0_*` já conectadas ao projeto.
+
+A URL de callback é específica do domínio estável da branch Preview. Se o domínio do projeto Vercel mudar, atualize essas URLs no Auth0 e o `APP_BASE_URL` no Vercel.
+
 ## Jornada pela interface
 
 1. Acesse o Preview do frontend sem sessão e escolha **Entrar** ou **Criar conta**.
