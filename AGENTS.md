@@ -14,6 +14,8 @@ Mantenha a separação: o frontend não acessa o banco diretamente nem contém c
 
 ## Frontend — `apps/web/`
 
+- Antes de criar ou alterar páginas e componentes visuais, consulte [`docs/ui/UI-GUIDE.md`](docs/ui/UI-GUIDE.md) e, para tokens e padrões visuais, [`docs/ui/design-system.md`](docs/ui/design-system.md). Trate referências a funcionalidades do legado como contexto, não como escopo automático de migração.
+
 - Mantenha componentes, páginas e lógica visual no frontend; não replique nele regras de autorização ou regras de domínio que precisam ser confiáveis.
 - Consuma o backend usando a URL pública da API configurada para o ambiente. Variáveis expostas ao navegador devem conter somente dados que possam ser públicos.
 - Trate estados de carregamento, sucesso, erro e ausência de dados nas interfaces que dependem da API.
@@ -67,3 +69,41 @@ Use a documentação para orientar testes manuais e automatizados. Não descreva
 - O projeto frontend usa `apps/web` como diretório raiz; o projeto da API usa `apps/api`.
 - Integre mudanças em `main` somente depois de validar o fluxo afetado no Preview de `dev`. Quando uma mudança atingir frontend e API, valide os dois deployments e a integração entre eles.
 - Consulte `docs/deployments.md` antes de alterar a configuração de deploy.
+
+## Diretrizes adaptadas do repositório anterior
+
+As regras abaixo preservam práticas úteis do projeto de origem, ajustadas à estrutura e às ferramentas deste repositório.
+
+### Escopo e implementação
+
+- Antes de alterar comportamento, leia o código envolvido, os chamadores, o contrato da API, a documentação do fluxo e os testes existentes.
+- Prefira a menor alteração completa. Reutilize padrões e dependências existentes; não adicione abstrações ou opções que não sejam necessárias ao fluxo solicitado.
+- Para funcionalidades novas ou mudanças relevantes, registre objetivo, critérios de aceite, dependências e pendências na documentação de migração ou no fluxo correspondente.
+- Não considere uma funcionalidade liberada apenas porque compila: valide o fluxo ponta a ponta no Preview de `dev` antes de integrar a `main`.
+
+### Segurança de autenticação e autorização
+
+Para mudanças em autenticação, autorização ou dados privados, inclua verificações pertinentes para:
+
+- Requisição sem autenticação e resposta `401`.
+- Usuário autenticado sem permissão e resposta `403`.
+- Tentativa de acessar ou alterar dados pertencentes a outro usuário (IDOR/BOLA).
+- Escalada indevida entre jogador e mestre.
+- Identificadores, parâmetros e corpos inválidos ou manipulados.
+- Vazamento de dados privados, tokens ou detalhes internos em respostas e logs.
+
+Não confie em permissões ou resultados enviados somente pelo frontend. Se houver vulnerabilidade crítica ou alta relacionada à mudança, mantenha a entrega bloqueada até correção; documente riscos residuais conhecidos.
+
+### Persistência e migrações
+
+- Use migrações versionadas para alterações de schema; não execute DDL automaticamente durante requisições.
+- Antes de aplicar uma migração, confirme explicitamente projeto, branch e banco de destino. Valide primeiro no banco compartilhado de Preview/teste e mantenha produção isolada.
+- Nunca apague, limpe ou reutilize dados de produção para testes. Use dados fictícios no ambiente compartilhado.
+- Registre instruções de aplicação e rollback junto da migração quando a alteração puder afetar dados persistidos.
+
+### Validação antes da integração
+
+- Execute verificações no aplicativo alterado: instalação compatível com o lockfile, build, tipos/lint e testes pertinentes, conforme os scripts disponíveis em cada aplicação.
+- Revise o diff, manifests, lockfiles e arquivos de configuração para remover alterações acidentais e garantir que nenhum segredo foi incluído.
+- Se uma verificação necessária não puder ser executada, informe o comando e o bloqueio; não descreva a entrega como validada.
+- Atualize OpenAPI e o roteiro em `docs/api/flows/` sempre que mudar um endpoint, incluindo autenticação, validações, efeitos persistidos, erros e sequência de chamadas.
