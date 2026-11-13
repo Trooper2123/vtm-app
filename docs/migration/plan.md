@@ -53,7 +53,7 @@ O README do app antigo classifica vários recursos como implementados, mas ressa
 - Inventário estático detalhado em [`docs/migration/inventory.md`](./inventory.md): 93 rotas e métodos, 23 páginas, módulos de domínio, tabelas declaradas, modelo de autorização, integrações e testes encontrados.
 - Estados do legado separados entre implementação, configuração, evidência de teste, pendências e decisão de migração; nenhum dado de personagens, mesas, sessões ou usuários será transferido.
 - Busca inicial por ações de servidor; mutações encontradas estão nos Route Handlers. A relação completa entre UI, chamadas, payloads/erros, cookies e efeitos colaterais do piloto continua pendente e será registrada antes da implementação.
-- Piloto proposto: leitura do catálogo de poderes de disciplina, sem migrar telas/persistência de fichas nem registros de mesas. O handler tem teste de sessão ausente e validação de parâmetros; o teste ainda precisa ser executado.
+- Primeiro fluxo vertical selecionado: autenticação Auth0 → consulta/criação do perfil no Neon novo → área inicial. Esta decisão substitui a proposta anterior de começar por um catálogo; não migra nem importa fichas ou registros de mesas.
 
 **Gate:** inventário e escopo do piloto registrados; contrato detalhado do piloto e reprodução em ambiente isolado permanecem **pendentes**. Executar os testes e a consulta autenticada/sem sessão antes de considerar a Fase 0 fechada. Arquivos de teste e CI de escopo limitado não provam validação global.
 
@@ -83,7 +83,7 @@ Começar por leitura de dados de referência sem alterar personagens ou mesas. C
 
 ### Fase 3 — Perfil e ciclo básico de personagem
 
-Migrar um fluxo de cada vez: criação de perfil na base nova após autenticação; criar, listar, visualizar, editar e validar fichas criadas no `vtm-app`; depois duplicar fichas dentro do novo app. Não buscar nem importar fichas do legado.
+O perfil inicial é o primeiro fluxo vertical. Depois do gate desse fluxo, migrar um fluxo de cada vez: criar, listar, visualizar, editar e validar fichas criadas no `vtm-app`; depois duplicar fichas dentro do novo app. Não buscar nem importar fichas do legado.
 
 **Atenção:** a identidade Auth0 pode ser a mesma, mas perfis e registros da aplicação são novos e ficam no banco do `vtm-app`. Toda consulta/mutação deve aplicar propriedade e permissão no servidor.
 
@@ -158,4 +158,4 @@ Um módulo só está pronto para migrar/ser liberado quando:
 | Bases independentes | Não haverá importação nem sincronização. O legado mantém seus registros; novos registros pertencem ao `vtm-app` e não aparecem no app antigo. |
 | Rollback com dados novos | Reverter o código não apaga a base nova. Se o tráfego voltar ao legado, os registros criados no `vtm-app` só permanecem acessíveis pelo próprio app novo. |
 
-**Próximo passo:** fechar a reprodução do piloto indicado em [`docs/migration/inventory.md`](./inventory.md) no legado, usando ambiente e dados isolados. Depois, aprovar o padrão Auth0/Neon para a base independente vazia do `vtm-app` e portar somente o catálogo selecionado.
+**Próximo passo:** configurar o audience da API no Auth0 e as variáveis de Preview, aplicar a migration somente no Neon compartilhado de Preview/teste e executar o fluxo descrito em [`docs/api/flows/profile-onboarding.md`](../api/flows/profile-onboarding.md). O profile flow permanece pendente de validação até o teste ponta a ponta no Preview.
