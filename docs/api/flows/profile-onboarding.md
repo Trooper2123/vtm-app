@@ -8,7 +8,7 @@ Validar que uma pessoa autenticada pelo Auth0 cria um perfil próprio no banco N
 
 - Frontend e API da branch `dev` publicados em Preview.
 - Variáveis Auth0 do frontend configuradas: `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET`, `AUTH0_SECRET`, `AUTH0_AUDIENCE`.
-- Uma API criada no tenant Auth0 com audience igual a `AUTH0_AUDIENCE); o frontend solicita `openid profile email`.
+- Uma API criada no mesmo tenant Auth0 da aplicação web com audience igual a `AUTH0_AUDIENCE`; o frontend solicita `openid profile email`.
 - `AUTH0_ISSUER_URL` e `AUTH0_API_AUDIENCE` na API, usando o mesmo issuer e audience.
 - `API_BASE_URL` no projeto Vercel do frontend apontando para o deployment Preview da API.
 - `DATABASE_URL` no projeto Vercel da API apontando ao Neon compartilhado de Preview/teste.
@@ -21,7 +21,8 @@ No tenant associado ao projeto Vercel:
 1. Cadastre uma API com **Identifier** `https://vtm-app-api` e assinatura RS256. Esse valor deve ser igual ao audience configurado no frontend e na API.
 2. Na aplicação Web, permita o callback `https://meus-vampiros-web-git-dev-tereza-s-cereja.vercel.app/auth/callback`.
 3. Adicione `https://meus-vampiros-web-git-dev-tereza-s-cereja.vercel.app` às Allowed Logout URLs e Allowed Web Origins.
-4. As variáveis de Preview `APP_BASE_URL`, `API_BASE_URL`, `AUTH0_AUDIENCE`, `AUTH0_ISSUER_URL` e `AUTH0_API_AUDIENCE` foram preparadas para a branch `dev`. As credenciais do frontend permanecem nas variáveis `VTM_AUTH_AUTH0_*` já conectadas ao projeto.
+4. Autorize a aplicação Web para acesso delegado à API.
+5. As variáveis de Preview `APP_BASE_URL`, `API_BASE_URL`, `AUTH0_AUDIENCE`, `AUTH0_ISSUER_URL` e `AUTH0_API_AUDIENCE` foram preparadas para a branch `dev`. As credenciais do frontend permanecem nas variáveis `VTM_AUTH_AUTH0_*` já conectadas ao projeto.
 
 A URL de callback é específica do domínio estável da branch Preview. Se o domínio do projeto Vercel mudar, atualize essas URLs no Auth0 e o `APP_BASE_URL` no Vercel.
 
@@ -33,6 +34,17 @@ A URL de callback é específica do domínio estável da branch Preview. Se o do
 4. Salve. A interface envia a criação por uma Server Action para a API.
 5. Após HTTP `201`, a interface navega para `/home`.
 6. Encerre e inicie novamente a sessão; perfil existente deve levar direto à área inicial.
+7. Na área inicial, escolha **Sair**. O link `/auth/logout` é atendido pelo middleware do SDK Auth0, encerra a sessão da aplicação e redireciona conforme as Allowed Logout URLs.
+
+## Rotas de autenticação do frontend
+
+As rotas abaixo são fornecidas pelo middleware `auth0.middleware()` do SDK; não são endpoints da API de domínio:
+
+| Rota | Uso |
+|---|---|
+| `/auth/login` | Iniciar login |
+| `/auth/callback` | Retorno após autenticação |
+| `/auth/logout` | Encerrar sessão e iniciar logout no Auth0 |
 
 ## Contrato de chamadas
 
@@ -91,12 +103,11 @@ curl -i -X POST "$API_BASE_URL/api/v1/profile" \
 
 ## Estado da validação
 
-**Estado: implementado parcialmente; jornada autenticada ainda não aprovada.**
+**Estado: login e exibição do formulário inicial validados; criação e persistência do perfil ainda pendentes de validação.**
 
-- Os builds Vercel de frontend e API da branch `dev` passaram no commit `f28d480`.
-- A página inicial do Preview respondeu HTTP `200`; `/auth/login` redirecionou HTTP `307` ao Auth0 com audience `https://vtm-app-api` e callback estável da branch `dev`.
-- `GET /api/v1/health` respondeu HTTP `200`.
-- A tabela `public.profiles` foi criada no branch Neon compartilhado `preview-test` e no branch Vercel `preview/dev`. Ambos estavam sem dados de aplicação; a branch de produção não foi alterada.
-- Falta cadastrar no Auth0 a API com o identifier `https://vtm-app-api` e liberar os callback/logout URLs listados acima. Em seguida, executar login real, consulta inicial `404`, criação `201`, consulta posterior `200` e repetição `409`.
+- O login no Preview Auth0 foi concluído e a interface exibiu o formulário de primeiro acesso.
+- A tela `/home` agora oferece **Sair** por `/auth/logout`, rota atendida pelo middleware do SDK Auth0.
+- Ainda é necessário validar o salvamento do perfil (HTTP `201`), a consulta seguinte (HTTP `200`), o retorno direto à área inicial em novo login e o encerramento da sessão.
+- Builds de frontend e API da branch `dev` haviam passado no commit `740b119`; a atualização do link de logout precisa de novo build Preview.
 
-Não marcar o fluxo como validado até completar os testes autenticados de sucesso e erro.
+Não marcar o fluxo completo como validado até concluir os testes autenticados de sucesso e erro.
