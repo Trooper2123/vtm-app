@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "next": "15.5.28",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.1.2",
+    "react-dom": "19.1.2",
     "@auth0/nextjs-auth0": "^4.33.0"
   },
   "devDependencies": {
