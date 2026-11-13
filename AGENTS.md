@@ -14,6 +14,8 @@ Mantenha a separação: o frontend não acessa o banco diretamente nem contém c
 
 ## Frontend — `apps/web/`
 
+- Antes de criar ou alterar páginas e componentes visuais, consulte [`docs/ui/UI-GUIDE.md`](docs/ui/UI-GUIDE.md) e, para tokens e padrões visuais, [`docs/ui/design-system.md`](docs/ui/design-system.md). Trate referências a funcionalidades do legado como contexto, não como escopo automático de migração.
+
 - Mantenha componentes, páginas e lógica visual no frontend; não replique nele regras de autorização ou regras de domínio que precisam ser confiáveis.
 - Consuma o backend usando a URL pública da API configurada para o ambiente. Variáveis expostas ao navegador devem conter somente dados que possam ser públicos.
 - Trate estados de carregamento, sucesso, erro e ausência de dados nas interfaces que dependem da API.
