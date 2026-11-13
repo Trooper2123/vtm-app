@@ -91,4 +91,12 @@ curl -i -X POST "$API_BASE_URL/api/v1/profile" \
 
 ## Estado da validação
 
-Implementação iniciada na branch `dev`. Marcar como validado somente depois do build das duas aplicações, teste da migration no banco compartilhado Preview/teste e execução da jornada acima no Preview.
+**Estado: implementado parcialmente; jornada autenticada ainda não aprovada.**
+
+- Os builds Vercel de frontend e API da branch `dev` passaram no commit `f28d480`.
+- A página inicial do Preview respondeu HTTP `200`; `/auth/login` redirecionou HTTP `307` ao Auth0 com audience `https://vtm-app-api` e callback estável da branch `dev`.
+- `GET /api/v1/health` respondeu HTTP `200`.
+- A tabela `public.profiles` foi criada no branch Neon compartilhado `preview-test` e no branch Vercel `preview/dev`. Ambos estavam sem dados de aplicação; a branch de produção não foi alterada.
+- Falta cadastrar no Auth0 a API com o identifier `https://vtm-app-api` e liberar os callback/logout URLs listados acima. Em seguida, executar login real, consulta inicial `404`, criação `201`, consulta posterior `200` e repetição `409`.
+
+Não marcar o fluxo como validado até completar os testes autenticados de sucesso e erro.
