@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npx --yes vercel dev",
+    "dev": "npx --yes vercel dev --listen 3001",
     "build": "tsc --noEmit"
   },
   "devDependencies": {

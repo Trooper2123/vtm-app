@@ -8,7 +8,7 @@ Use Node.js 22 e instale as dependências desta aplicação:
 
 ```sh
 npm install
-npm run dev
+npm run dev # API local em http://localhost:3001
 ```
 
 Endpoints documentados em `../../docs/api/openapi.yaml`:
