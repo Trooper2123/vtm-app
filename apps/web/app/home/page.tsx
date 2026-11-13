@@ -23,6 +23,7 @@ export default async function HomePage() {
           <h1>Não foi possível carregar seu perfil</h1>
           <p>Verifique a configuração da API e tente novamente.</p>
           <Link href="/">Tentar novamente</Link>
+          <p><Link href="/auth/logout">Sair</Link></p>
         </section>
       </main>
     );
@@ -36,6 +37,7 @@ export default async function HomePage() {
           <h1>Não foi possível carregar seu perfil</h1>
           <p>O serviço respondeu com um erro. Tente novamente em alguns instantes.</p>
           <Link href="/">Tentar novamente</Link>
+          <p><Link href="/auth/logout">Sair</Link></p>
         </section>
       </main>
     );
@@ -55,6 +57,7 @@ export default async function HomePage() {
           <div><dt>E-mail</dt><dd>{profile.email}</dd></div>
           <div><dt>Cadastro</dt><dd>{accountLabels[profile.accountType]}</dd></div>
         </dl>
+        <p><Link href="/auth/logout">Sair</Link></p>
       </section>
     </main>
   );
