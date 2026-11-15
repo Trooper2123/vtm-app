@@ -18,7 +18,7 @@ O projeto é disponibilizado por meio de **dois projetos Vercel**, informados pe
 
 Esses links são para os **painéis dos projetos na Vercel**, não necessariamente URLs públicas da aplicação ou da API. O acesso aos painéis pode exigir autenticação e permissão na equipe.
 
-- Runtime Node.js 22.
+- Runtime Node.js 26.
 - O frontend não acessa o banco diretamente; dados e regras passam pela API.
 - Conforme `AGENTS.md`, `main` é a branch de produção e `dev` é usada para Preview; valide os fluxos antes de integrar mudanças.
 
