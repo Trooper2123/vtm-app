@@ -18,12 +18,14 @@ Não criar por antecipação: gestão de Narrador, sessões, convites, aprovaç�
 2. Um usuário pode possuir **0..N** personagens jogáveis.
 3. Cada personagem tem **exatamente um proprietário**; a propriedade não muda implicitamente com o vínculo de mesa.
 4. Um personagem tem **0..1 mesa ativa**; não pode estar simultaneamente vinculado a duas mesas.
-5. Uma mesa pode ter **0..N personagens** de jogadores distintos; a mesma pessoa pode ter múltiplos personagens na mesma mesa **somente se permitido pela política da mesa** (decisão em aberto; padrão sugerido: permitir e sinalizar ao Narrador futuramente).
-6. O mesmo usuário pode participar como jogador em várias mesas e ser Narrador em outras; a autorização é **contextual à mesa/recurso**, não um `role` global mutuamente exclusivo.
+5. Cada jogador pode ter **no máximo um personagem vampiro vivo/ativo por mesa**. Outros vampiros desse jogador na mesma mesa devem permanecer inativos, históricos ou não vinculados; um substituto só pode ser ativado depois que o vampiro anterior morrer (morte registrada e validada pelo Narrador).
+6. O mesmo usuário pode participar como jogador em várias mesas e ser Narrador em outras, **mas nunca ser jogador na crônica/mesa que narra**. A autorização é contextual à mesa/recurso, não um `role` global mutuamente exclusivo.
 7. A escolha de visualização é preferência de interface, **não** permissão. A API valida identidade, propriedade e associação à mesa a cada operação.
 8. Personagem independente permanece acessível mesmo sem mesa; a ausência de mesa **não** implica exclusão nem rascunho inválido.
 9. Desvincular personagem **não** apaga ficha, notas pessoais ou histórico; dados privados da mesa e direitos de participação permanecem sujeitos às regras de autorização da mesa.
 10. Personagens vinculados não podem ser transferidos diretamente para outra mesa sem primeiro encerrar o vínculo anterior, segundo o fluxo autorizado.
+11. **Fichas humanas são dependentes de um personagem vampiro**: cada ficha humana deve referenciar um vampiro existente e autorizado; não é uma vaga independente de jogador nem pode existir sem vínculo com vampiro. O proprietário e a visibilidade do humano seguem política explícita da mesa; o vínculo com o vampiro é obrigatório. Humanos não contam para o limite de um vampiro ativo por jogador e mesa.
+12. A morte do vampiro é um evento de domínio validado pelo Narrador; arquivamento, inatividade, desconexão ou remoção de mesa **não equivalem a morte** e não liberam automaticamente vaga para substituição. A eventual exceção administrativa deverá ser especificada separadamente.
 
 ## 3. Entidades e persistência propostas
 
@@ -36,7 +38,9 @@ Não criar por antecipação: gestão de Narrador, sessões, convites, aprovaç�
 
 ### `characters`
 - `id` UUID PK; `owner_user_id` FK NOT NULL → `user_profiles.id`.
-- `name` texto NOT NULL; `concept` opcional; `clan` opcional; `character_data` JSON versionado para campos V5 **somente após definição de contrato de ficha**.
+- `name` texto NOT NULL; `character_type` enum `vampire|human` NOT NULL; `concept` opcional; `clan` opcional (apenas vampiro); `character_data` JSON versionado para campos V5 **somente após definição de contrato de ficha**.
+- Para humanos, `linked_vampire_id` FK NOT NULL → `characters.id` (tipo vampiro); para vampiros, `linked_vampire_id` NULL. Implementar validação transacional e de autorização para impedir referência cruzada indevida. Proibir ciclo e humano apontando para humano.
+- Para vampiros, registrar estado narrativo `alive|dead` e data/evento de morte quando aplicável; não permitir que o jogador marque a morte diretamente para liberar outra ficha.
 - `created_at`, `updated_at`, `archived_at` opcional; `revision` inteiro para concorrência.
 - O MVP não deve aceitar valores mecânicos arbitrários como definitivos sem validação V5 futura. Definir campos mínimos e seu estado de rascunho explicitamente antes da implementação.
 
@@ -45,8 +49,11 @@ Não criar por antecipação: gestão de Narrador, sessões, convites, aprovaç�
 
 ### `character_table_memberships` (preferência arquitetural)
 - `id`, `character_id` FK, `table_id` FK, `status` (`pending|active|ended`), `created_at`, `ended_at`, `approved_by` opcional.
+- Para um humano associado a vampiro de mesa, o contexto de mesa é **derivado do vampiro vinculado**; não criar vínculo independente que permita ao humano aparecer em outra crônica.
 - Índice único parcial por `character_id` para `status IN ('pending','active')` **se** convites pendentes também bloquearem novas solicitações; esta política deve ser aprovada antes da migração.
 - Para a regra inequívoca de no máximo **uma mesa ativa**, índice único parcial por `character_id` onde `status='active'` é obrigatório.
+- **Unicidade adicional obrigatória:** no máximo um vampiro com vínculo `active` e estado `alive` por (`owner_user_id`, `table_id`). Como a regra cruza tabelas, não basta um índice simples em `character_table_memberships`: projetar uma restrição de slot/ocupação por jogador+mesa, ou esquema equivalente, com transação e trava/constraint no banco. A validação deve resistir a concorrência.
+- A mesa deve ter Narrador identificado (`storyteller_user_id` ou associação equivalente) e impedir, por regra de integridade/autorização, qualquer participação desse usuário como jogador nessa mesma mesa.
 - Preservar histórico em vez de sobrescrever `table_id` diretamente. A relação ativa é derivada de um vínculo vigente, não uma lista enviada pelo cliente.
 - Impedir vínculo a mesa inexistente, arquivada/inativa (se houver esse conceito) ou sem permissão. Autorizar criação, aprovação e encerramento por política de mesa, ainda a especificar.
 
@@ -57,10 +64,10 @@ Não criar por antecipação: gestão de Narrador, sessões, convites, aprovaç�
 1. **Entrar:** autenticação existente; carregar `GET /me`; se perfil não existir, encaminhar para criação do perfil sem criar permissões.
 2. **Primeiro acesso:** informar nome de exibição, validar e salvar. Não exigir criação de personagem.
 3. **Área inicial do jogador:** mostrar saudação com nome real, quantidade de personagens e lista com nome, conceito (quando houver), estado de vínculo (`Sem mesa`, `Vínculo pendente`, `Vinculado à mesa`) e ações efetivamente implementadas. Nunca exibir dados de exemplo como se fossem reais.
-4. **Criar personagem:** iniciar ficha independente; salvar os campos mínimos validados; ao sucesso, mostrar ficha e permitir voltar à lista.
+4. **Criar personagem:** iniciar ficha de vampiro independente; ao criar ficha humana, exigir a seleção de vampiro autorizado existente. Salvar campos mínimos validados; ao sucesso, mostrar ficha e permitir voltar à lista.
 5. **Consultar/editar:** somente proprietário ou acesso explicitamente autorizado; edição otimista deve usar `revision` ou ETag para impedir sobrescrita silenciosa.
-6. **Vincular a mesa:** não criar botão operacional até existir fluxo de mesa/convite/autorização. Na primeira fase, indicar apenas o estado do vínculo existente; o vínculo é **P1 dependente de mesas**.
-7. **Desvincular:** futura ação autorizada, com confirmação e preservação do histórico; não permitir contornar aprovação ou acesso a informações reservadas.
+6. **Vincular a mesa:** não criar botão operacional até existir fluxo de mesa/convite/autorização. Na primeira fase, indicar apenas o estado do vínculo existente; o vínculo é **P1 dependente de mesas**. Ao ativar um vampiro, conferir que o usuário não narra a crônica e não tem outro vampiro vivo ativo nela; humanos acompanham o contexto do vampiro.
+7. **Morte e sucessão:** o Narrador registra/confirma morte do vampiro; a ficha falecida permanece no histórico e o jogador pode criar/vincular um novo vampiro para aquela mesa. O vínculo anterior deve ser encerrado como consequência transacional. Desvincular ou arquivar uma ficha viva não deve ser usado para burlar a regra de sucessão; política de saída de mesa será definida separadamente.
 8. **Visão Narrador:** não apresentar painel funcional nem atalho que pareça disponível. Futuramente, alternância de contexto sem trocar conta ou expor dados de outra mesa.
 
 ### Estados de interface obrigatórios
@@ -87,6 +94,8 @@ Carregando, vazio (nenhum personagem), sucesso, erro de campo, erro de serviço,
 - Paginação com limite máximo e ordenação estável; não carregar todos os personagens sem limite.
 - A API deriva `owner_user_id` da sessão, nunca do corpo.
 - O cliente não escolhe `approved_by`, `status` de vínculo ou `table_id` sem fluxo específico autorizado.
+- O jogador não pode autodeclarar morte para liberar vaga. A API valida evento autorizado pelo Narrador, encerra o vínculo anterior e só então libera a nova ativação.
+- Proibir qualquer associação jogador↔mesa quando o mesmo usuário é Narrador da crônica; a troca de visualização não contorna essa regra.
 - Respostas do jogador nunca incluem notas privadas, segredos, SPCs ou decisões do Narrador.
 - Se o provedor de autenticação não estiver definido/operacional, resolver essa dependência antes de implementar `/me`.
 
@@ -112,8 +121,11 @@ Acessibilidade: foco visível, labels, erro junto ao campo, alvos de 44×44px, c
 - **US-02 Múltiplos personagens:** dado perfil válido, criar A e B resulta em dois registros com mesmo proprietário e IDs diferentes; ambos aparecem na lista.
 - **US-03 Independente:** ao criar personagem sem mesa, estado é `Sem mesa` e ficha continua editável pelo dono.
 - **US-04 Vínculo único:** não é possível ter dois vínculos `active` para a mesma ficha, inclusive sob requisições concorrentes; banco impede duplicação.
-- **US-05 Múltiplas mesas:** usuário pode ter personagem A na mesa 1 e B na mesa 2, sem transferir propriedade.
-- **US-06 Duplo papel:** usuário que narra uma mesa pode continuar usando a visão de jogador e suas próprias fichas; mudar visão não muda autorização.
+- **US-05 Múltiplas mesas:** usuário pode ter vampiro A na mesa 1 e vampiro B na mesa 2, sem transferir propriedade.
+- **US-05a Um vampiro por mesa:** tentar ativar segundo vampiro vivo do mesmo jogador na mesma mesa retorna conflito, inclusive sob concorrência.
+- **US-05b Sucessão por morte:** após morte confirmada pelo Narrador e encerramento do vínculo ativo, um novo vampiro pode ser ativado; arquivar/desvincular sem morte não é autorização de substituição.
+- **US-05c Humanos vinculados:** criar humano sem vampiro ou com vampiro de outro proprietário/sem autorização falha; humano pertence ao contexto do vampiro e não ocupa slot de vampiro.
+- **US-06 Duplo papel:** usuário que narra uma mesa pode continuar usando a visão de jogador em **outras mesas**, mas não pode vincular personagem jogador à crônica que narra; mudar visão não muda autorização.
 - **US-07 Isolamento:** usuário X não lê, edita nem lista ficha de Y por manipular IDs; não recebe dados reservados da mesa.
 - **US-08 Concorrência:** duas edições da mesma revisão não sobrescrevem silenciosamente; a segunda retorna 409.
 - **US-09 Falhas:** erro de rede preserva campos; retorno do servidor não é interpretado como sucesso antes da confirmação.
@@ -123,7 +135,7 @@ Acessibilidade: foco visível, labels, erro junto ao campo, alvos de 44×44px, c
 
 **Fase A — P0:** autenticação existente ou dependência resolvida; perfil; CRUD mínimo de personagens independentes; listagem; isolamento por proprietário; UI de jogador; testes.
 
-**Fase B — P1:** mesa/crônica e política de participação; vínculos com aprovação, encerramento e histórico; listagem de estados; testes de concorrência e permissões.
+**Fase B — P1:** mesa/crônica e política de participação; vínculo único de vampiro vivo por jogador/mesa; ficha humana vinculada ao vampiro; bloqueio de Narrador como jogador na própria crônica; sucessão após morte confirmada; histórico; testes de concorrência e permissões.
 
 **Fase C — P2:** visão Narrador separada, ações de mesa, convites, sessões e controle de personagens autorizados. Não antecipar a UI de Narrador na Fase A.
 
@@ -131,9 +143,9 @@ Acessibilidade: foco visível, labels, erro junto ao campo, alvos de 44×44px, c
 
 1. **Autenticação:** confirmar provedor, claims e fluxo de primeiro acesso efetivamente disponíveis no novo repositório.
 2. **Ficha V5:** decidir quais campos podem ser salvos como rascunho sem automatizar criação mecânica; consultar apenas os PDFs V5.
-3. **Participação:** pode o mesmo jogador colocar mais de um personagem na mesma mesa? Padrão sugerido: sim, condicionado à política da mesa.
+3. **Participação (decidida):** no máximo um vampiro vivo ativo por jogador/mesa; humanos devem referenciar vampiro. **Pendente:** definir propriedade/visibilidade de humanos quando representarem NPCs ou dependentes de outro jogador.
 4. **Aprovação:** convite, solicitação ou ambos? Quem aprova e quando o vínculo passa a `active`?
-5. **Histórico:** reuso de ficha em nova mesa e retenção de dados privados da anterior.
+5. **Histórico e morte:** reuso de ficha em nova mesa e retenção de dados privados da anterior; definir tratamento de exceções administrativas (saída de jogador, cancelamento de mesa, mudança de Narrador) sem confundir com morte.
 6. **Exclusão:** arquivamento reversível ou exclusão; política de retenção e impacto em vínculos.
 7. **Rotas:** confirmar compatibilidade com a navegação já existente antes de implementação.
 
@@ -146,6 +158,7 @@ Acessibilidade: foco visível, labels, erro junto ao campo, alvos de 44×44px, c
 - [ ] Atualizar `docs/api/openapi.yaml` e `docs/api/flows/` na **mesma mudança** dos endpoints.
 - [ ] Implementar UI com estados completos e sem funcionalidades fictícias.
 - [ ] Testar 401, 403, 404, 409, 422, IDOR/BOLA, concorrência, paginação e isolamento de mesas.
+- [ ] Testar segundo vampiro vivo na mesma mesa, sucessão por morte autorizada, humano sem vampiro e Narrador tentando ingressar como jogador na própria crônica.
 - [ ] Executar build, lint, testes e revisão visual/acessibilidade; registrar resultados reais.
 - [ ] Validar frontend e API no Preview de `dev` antes de integrar à `main`.
 
