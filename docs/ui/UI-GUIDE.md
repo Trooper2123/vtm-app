@@ -1,4 +1,4 @@
-# UI-GUIDE — Direcionamento de Layout e Tema
+> **Atualização visual — Arquivo Gótico Contemporâneo:** para o frontend novo, consultar primeiro [arquivo-gotico-contemporaneo.md](./arquivo-gotico-contemporaneo.md) e os tokens efetivamente definidos em `apps/web/app/globals.css`. As seções herdadas abaixo (Tailwind, componentes, fontes, tokens e fluxos do projeto antigo) são referências históricas, não prova de implementação no novo frontend. A nova direção usa superfícies digitais escuras com papel pontual, mantendo formulários lisos, foco visível e dados reais.\n\n---\n\n# UI-GUIDE — Direcionamento de Layout e Tema
 
 > **Adaptação para `vtm-app`:** este documento foi importado do repositório `meus-vampiros` como referência visual. A nova aplicação está em migração incremental e pode não possuir os componentes, tokens, rotas ou funcionalidades citados aqui. Antes de reutilizar uma regra, confirme sua existência em `apps/web`; não implemente funcionalidades do legado apenas porque aparecem neste guia. Para regras específicas do frontend novo, prevalecem a estrutura e os contratos documentados neste repositório.
 
