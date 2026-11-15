@@ -8,10 +8,12 @@ Use Node.js 22 e instale as dependências desta aplicação:
 
 ```sh
 npm install
-npm run dev
+npm run dev:vercel -- --listen 3001
 ```
 
 A rota inicial é `GET /api/v1/health`. O contrato está em `../../docs/api/openapi.yaml` e o roteiro de validação em `../../docs/api/flows/health.md`.
+
+Na raiz do repositório, `npm run dev` inicia API e frontend juntos. O script da API se chama `dev:vercel` para que o Vercel Dev não o detecte como Development Command e invoque a si mesmo. Nos ajustes do projeto Vercel da API, deixe Development Command sem override; ele não deve chamar `vercel dev`.
 
 ## Configuração
 
