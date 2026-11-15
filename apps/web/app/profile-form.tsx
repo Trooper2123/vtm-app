@@ -11,17 +11,17 @@ export function ProfileForm({ email }: { email: string }) {
   return (
     <form action={formAction} className="profile-form">
       <label>
-        Nome
+        <span className="field-label">Nome</span>
         <input name="name" autoComplete="name" maxLength={100} required />
       </label>
 
       <label>
-        Apelido <span className="optional">(opcional)</span>
+        <span className="field-label">Apelido <span className="optional">(opcional)</span></span>
         <input name="nickname" autoComplete="nickname" maxLength={40} />
       </label>
 
       <label>
-        Pronomes <span className="optional">(opcional)</span>
+        <span className="field-label">Pronomes <span className="optional">(opcional)</span></span>
         <input
           name="pronouns"
           placeholder="Ex.: ela/dela"
@@ -31,7 +31,7 @@ export function ProfileForm({ email }: { email: string }) {
       </label>
 
       <label>
-        E-mail
+        <span className="field-label">E-mail</span>
         <input
           name="email"
           type="email"

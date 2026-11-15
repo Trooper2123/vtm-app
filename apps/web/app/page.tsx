@@ -10,12 +10,23 @@ export default async function HomePage() {
   if (!session) {
     return (
       <main className="page-shell">
-        <section className="panel">
-          <p className="eyebrow">Meus Vampiros</p>
-          <h1>Acesse sua conta</h1>
-          <p>Entre para criar seu perfil e acessar o aplicativo.</p>
-          <p><Link href="/auth/login">Entrar</Link></p>
-          <p><Link href="/auth/login?screen_hint=signup">Criar conta</Link></p>
+        <section className="panel panel--entry">
+          <div className="panel-intro">
+            <p className="eyebrow">Meus Vampiros / Acesso</p>
+            <div className="intro-copy">
+              <h1>Suas histórias começam aqui.</h1>
+              <p>Entre na sua conta para criar seu perfil no novo aplicativo.</p>
+            </div>
+          </div>
+          <div className="panel-content">
+            <p className="section-label">Acesso à conta</p>
+            <h2>Continue sua jornada</h2>
+            <p>Use sua conta para entrar ou crie uma agora.</p>
+            <div className="entry-actions">
+              <Link className="button-primary" href="/auth/login">Entrar</Link>
+              <Link className="button-secondary" href="/auth/login?screen_hint=signup">Criar conta</Link>
+            </div>
+          </div>
         </section>
       </main>
     );
@@ -51,11 +62,21 @@ export default async function HomePage() {
 
   return (
     <main className="page-shell">
-      <section className="panel">
-        <p className="eyebrow">Primeiro acesso</p>
-        <h1>Crie seu perfil</h1>
-        <p>Essas informações serão usadas para identificar você no novo aplicativo.</p>
-        <ProfileForm email={session.user.email ?? ""} />
+      <section className="panel panel--entry">
+        <div className="panel-intro">
+          <p className="eyebrow">Meus Vampiros / Primeiro acesso</p>
+          <div className="intro-copy">
+            <h1>Crie seu perfil.</h1>
+            <p>Escolha como quer se apresentar no novo aplicativo.</p>
+          </div>
+          <a className="quiet-link" href="/auth/logout">Sair da conta</a>
+        </div>
+        <div className="panel-content">
+          <p className="section-label">Seus dados</p>
+          <h2>Apresentação</h2>
+          <p>Preencha as informações que serão associadas à sua conta.</p>
+          <ProfileForm email={session.user.email ?? ""} />
+        </div>
       </section>
     </main>
   );
