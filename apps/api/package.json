@@ -6,7 +6,7 @@
     "node": "26.x"
   },
   "scripts": {
-    "dev": "tsc --noEmit",
+    "dev:vercel": "npx --yes vercel dev",
     "build": "tsc --noEmit"
   },
   "devDependencies": {
@@ -15,11 +15,7 @@
     "typescript": "5.9.3"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
-    "jose": "^6.1.0"
-  },
-  "type": "module",
-  "allowScripts": {
-    "esbuild@0.27.0": true
+    "@neondatabase/serverless": "^1.2.1",
+    "jose": "^6.2.17"
   }
 }
