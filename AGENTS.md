@@ -66,7 +66,8 @@ Use a documentação para orientar testes manuais e automatizados. Não descreva
 - `main` é a branch de produção.
 - `dev` gera deployments Preview para validação.
 - Outras branches não devem gerar deployments nesses projetos Vercel.
-- O projeto frontend usa `apps/web` como diretório raiz; o projeto da API usa `apps/api`.
+- `vtm-app/apps/web` deve ser publicado no projeto Vercel `meus-vampiros-web`, com diretório raiz `apps/web` relativo ao repositório.
+- `vtm-app/apps/api` deve ser publicado no projeto Vercel `meus-vampiros-api`, com diretório raiz `apps/api` relativo ao repositório.
 - Integre mudanças em `main` somente depois de validar o fluxo afetado no Preview de `dev`. Quando uma mudança atingir frontend e API, valide os dois deployments e a integração entre eles.
 - Consulte `docs/deployments.md` antes de alterar a configuração de deploy.
 
