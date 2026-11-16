@@ -4,7 +4,7 @@
 
 Este repositório separa interface e backend para que cada parte possa ser validada e publicada de forma independente.
 
-- `apps/web/`: frontend Next.js 15, React 19 e TypeScript. Responsável por páginas, componentes, navegação e experiência do usuário.
+- `apps/web/`: frontend Next.js 16, React 19 e TypeScript. Responsável por páginas, componentes, navegação e experiência do usuário.
 - `apps/api/`: backend Node.js/TypeScript executado como Vercel Functions. Responsável por endpoints, validação no servidor, autorização, regras de domínio e acesso a dados.
 - `docs/api/openapi.yaml`: contrato oficial dos endpoints.
 - `docs/api/flows/`: roteiros ponta a ponta para exercitar e validar os fluxos da API.
